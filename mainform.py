@@ -530,10 +530,6 @@ def display_settings_dialog(event):
 
 
 def display_url_extractor(event):
-    # import url_extractor
-
-    # url_extractor.root.mainloop()
-    # url_extractor.display()
 
     import subprocess
     subprocess.Popen(['python', 'url_extractor.py', '-t'])

@@ -1,3 +1,5 @@
+import tempfile
+import subprocess
 import sys
 import io
 import re
@@ -42,7 +44,7 @@ def count_words(content):
     word_count = len(words)
     return word_count
 
-def execute(code):
+def execute1(code):
     try:
         # Create a stream to capture stdout
         original_stdout = sys.stdout
@@ -60,6 +62,41 @@ def execute(code):
         return output_string
     except Exception as e:
         return f"An error occurred: {e}"
+    
+def execute(code):
+    try:
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp:
+            temp.write(code.encode())  
+            temp_filename = temp.name  
+
+        # Capture stdout in a stream
+        original_stdout = sys.stdout
+        sys.stdout = captured_output = io.StringIO()
+
+        # Execute the code in the temporary file
+        process = subprocess.Popen(
+            ["python", temp_filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+        stdout, stderr = process.communicate()
+
+        # Restore the original stdout
+        sys.stdout = original_stdout
+        output_string = captured_output.getvalue()
+
+        # Handle errors and output
+        if stderr:
+            return f"An error occurred:\n{stderr.decode()}"
+        else:
+            return output_string  # Return captured output if no error
+
+    except Exception as e:
+        return f"An error occurred: {e}"
+    finally:
+        # Clean up the temporary file
+        if temp_filename:
+            import os
+            os.remove(temp_filename)
 
 def get_local_date_time():
     # Get the current local date and time
