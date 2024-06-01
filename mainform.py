@@ -1,6 +1,5 @@
 import sys
 import tkinter as tk
-import customtkinter as ctk
 import webbrowser
 from pystray import MenuItem as item
 import pystray
@@ -9,6 +8,7 @@ from PIL import Image, ImageTk
 from tkinter import Menu, messagebox, Scrollbar, Text, simpledialog, END, VERTICAL
 
 import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 import settings_dialog
 # import url_extractor
@@ -144,18 +144,11 @@ def create_new_note(event):
 def change_note_title(event):
     global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
 
-    # Create the dialog box
-    dialog = ctk.CTkInputDialog(
-        text="Enter new title:",
-        title="Change title",
+    #center_dialog(dialog)
+
+    selected_node_title = simpledialog.askstring(
+        title="Change title", prompt="Enter new title:\t\t\t\t\t", initialvalue=selected_node_title
     )
-
-    center_dialog(dialog)
-
-    selected_node_title = dialog.get_input()  # waits for input
-
-    # Close the dialog box
-    dialog.destroy()
 
     if selected_node_title != None and selected_node_title != "":
 
@@ -170,18 +163,9 @@ def change_note_title(event):
 def change_note_shortcut(event):
     global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
 
-    # Create the dialog box
-    dialog = ctk.CTkInputDialog(
-        text="Enter new shortcut:",
-        title="Change shortcut",
+    selected_node_shortcut = simpledialog.askstring(
+        title="Change shortcut", prompt="Enter new shortcut:\t\t\t", initialvalue=selected_node_shortcut
     )
-
-    center_dialog(dialog)
-
-    selected_node_shortcut = dialog.get_input()  # waits for input
-
-    # Close the dialog box
-    dialog.destroy()
 
     if selected_node_shortcut != None and selected_node_shortcut != "":
 
@@ -215,18 +199,9 @@ def rename_note_category(event):
             'Warning!', 'You cannot rename All Categories item. It is the default category.')
         return
 
-    # Create the dialog box
-    dialog = ctk.CTkInputDialog(
-        text="Enter new name of category:",
-        title="Rename Category",
+    new_category = simpledialog.askstring(
+        title="Rename Category", prompt="Enter new category name:\t\t\t\t\t", initialvalue=selected_node_category
     )
-
-    center_dialog(dialog)
-
-    new_category = dialog.get_input()  # waits for input
-
-    # Close the dialog box
-    dialog.destroy()
 
     if new_category != None and new_category != "":
 
@@ -249,18 +224,9 @@ def rename_note_category(event):
 def create_note_category(event):
     global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
 
-    # Create the dialog box
-    dialog = ctk.CTkInputDialog(
-        text="Enter new category:",
-        title="Create New Category",
+    new_category = simpledialog.askstring(
+        title="Create New Category", prompt="Enter new category:\t\t\t\t\t"
     )
-
-    center_dialog(dialog)
-
-    new_category = dialog.get_input()  # waits for input
-
-    # Close the dialog box
-    dialog.destroy()
 
     if new_category != None and new_category != "":
 
@@ -282,18 +248,9 @@ def create_note_category(event):
 def update_note_category(event):
     global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
 
-    # Create the dialog box
-    dialog = ctk.CTkInputDialog(
-        text="Enter new category:",
-        title="Update Category",
+    new_category = simpledialog.askstring(
+        title="Change category", prompt="Enter new category:\t\t\t\t\t", initialvalue=selected_node_category
     )
-
-    center_dialog(dialog)
-
-    new_category = dialog.get_input()  # waits for input
-
-    # Close the dialog box
-    dialog.destroy()
 
     if new_category != None and new_category != "":
 
@@ -468,6 +425,7 @@ def update_status_label(event_type):
 
     info = "Title: " + selected_node_title + " | " + "Category: " + \
         selected_node_category + " | " + "Shortcut: " + selected_node_shortcut
+    
     info = info + " | " + "Words: " + word_count + \
         " | " + " | " + "Lines: " + total_lines
 
@@ -744,7 +702,7 @@ def create_app():
 
     helper.center_window(root, 1360, 768)
 
-    hide_window()
+    #hide_window()
 
     root.mainloop()
 
