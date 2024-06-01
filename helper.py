@@ -44,35 +44,12 @@ def count_words(content):
     word_count = len(words)
     return word_count
 
-def execute1(code):
-    try:
-        # Create a stream to capture stdout
-        original_stdout = sys.stdout
-        sys.stdout = captured_output = io.StringIO()
-        #sys.stdout = captured_output = []
-
-        # Execute the provided code
-        exec(code)
-
-        # Restore the original stdout
-        sys.stdout = original_stdout
-
-        # Join the captured output into a single string
-        output_string = captured_output.getvalue()
-        return output_string
-    except Exception as e:
-        return f"An error occurred: {e}"
-    
 def execute(code):
     try:
         # Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as temp:
-            temp.write(code.encode())  
-            temp_filename = temp.name  
-
-        # Capture stdout in a stream
-        original_stdout = sys.stdout
-        sys.stdout = captured_output = io.StringIO()
+            temp.write(code.encode())  # Write the code to the file
+            temp_filename = temp.name  # Get the file's name
 
         # Execute the code in the temporary file
         process = subprocess.Popen(
@@ -80,15 +57,17 @@ def execute(code):
         )
         stdout, stderr = process.communicate()
 
-        # Restore the original stdout
-        sys.stdout = original_stdout
-        output_string = captured_output.getvalue()
+        # Decode output and errors
+        output = stdout.decode() if stdout else ""
+        error = stderr.decode() if stderr else ""
 
-        # Handle errors and output
-        if stderr:
-            return f"An error occurred:\n{stderr.decode()}"
+        # Check for errors first, then return the output if it's not empty
+        if error:
+            return f"An error occurred:\n{error}"
+        elif output:  # Check if output is not empty
+            return output  # Return captured output if no error and it's not empty
         else:
-            return output_string  # Return captured output if no error
+            return ""  # Return an empty string if there's no output
 
     except Exception as e:
         return f"An error occurred: {e}"
