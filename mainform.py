@@ -162,6 +162,31 @@ def change_note_title(event):
 
         select_first_item(treeview)
 
+def change_note_shortcut(event):
+    global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
+
+    # Create the dialog box
+    dialog = ctk.CTkInputDialog(
+        text="Enter new shortcut:",
+        title="Change shortcut",
+    )
+
+    center_dialog(dialog)
+
+    selected_node_shortcut = dialog.get_input()  # waits for input
+
+    # Close the dialog box
+    dialog.destroy()
+
+    if selected_node_shortcut != None and selected_node_shortcut != "":
+
+        new_content = editor.get("1.0", "end-1c")
+        helper.db.update_note_item(
+            selected_node_id, selected_node_category, selected_node_title, new_content, helper.get_local_date_time(), selected_node_shortcut)
+
+        load_nodes(treeview)
+
+        select_first_item(treeview)
 
 def delete_note(event):
     global selected_node_id, selected_node_category, selected_node_shortcut, selected_node_title
@@ -649,7 +674,9 @@ def create_app():
     popup_menu_treeview.add_command(
         label="New Note", command=lambda event=None: create_new_note(event), accelerator="Ctrl+N")
     popup_menu_treeview.add_command(
-        label="Change Note Title", command=lambda event=None: change_note_title(event))
+        label="Change Title", command=lambda event=None: change_note_title(event))
+    popup_menu_treeview.add_command(
+        label="Change Shortcut", command=lambda event=None: change_note_shortcut(event))
     popup_menu_treeview.add_command(
         label="Delete Note", command=lambda event=None: delete_note(event), accelerator="Ctrl+D")
     popup_menu_treeview.add_command(

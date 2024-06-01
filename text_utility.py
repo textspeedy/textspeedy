@@ -104,7 +104,6 @@ def display():
         "Extract Phone Numbers",
         "Extract Links",
         "Extract Links From Sitemaps",
-        "Format HTML to Pretty HTML",
         "Remove Duplicate Lines",
         "Remove Empty Lines",
         "Remove Line Breaks"
