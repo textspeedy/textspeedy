@@ -1,0 +1,13 @@
+pip install pynput
+pip install pyperclip
+pip install pyautoui
+pip install sqlite3
+pip install customtkinter
+pip install ttkbootstrap
+pip install pywebview
+pip install markdown
+pip install markdownify
+pip install requests
+pip install beautifulsoup4
+pip install pystray
+pip install pillow
