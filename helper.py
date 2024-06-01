@@ -1,6 +1,8 @@
 import sys
 import io
 import re
+from collections import OrderedDict
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -217,6 +219,21 @@ def extract_all_phone_numbers(text):
     phone_pattern = r'\+?\d+(?:[- (]+\d+\)?)+'
     phone_numbers = re.findall(phone_pattern, text)
     return '\n'.join(phone_numbers)
+
+def extract_urls(text):
+    # Regular expression pattern for matching URLs
+    # This pattern is fairly comprehensive but can be customized
+    url_pattern = re.compile(
+        r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    )
+
+    urls = re.findall(url_pattern, text)
+
+    # Use OrderedDict to maintain insertion order of unique URLs
+    unique_urls = OrderedDict.fromkeys(urls) 
+
+    result_string = "\n".join(unique_urls)
+    return result_string
 
 def extract_links_from_sitemaps(sitemap_urls):
     print(sitemap_urls)

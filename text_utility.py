@@ -57,6 +57,8 @@ def handle_option_selected(event):
         new_content = helper.extract_emails(content)
     elif selected_option == "Extract Phone Numbers":
         new_content = helper.extract_all_phone_numbers(content)
+    elif selected_option == "Extract Links":
+        new_content = helper.extract_urls(content)
     elif selected_option == "Extract Links From Sitemaps":
         extract_sitemap = True
         sitemap_array = content.strip().split('\n')
