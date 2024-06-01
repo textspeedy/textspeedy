@@ -3,6 +3,9 @@ Tired of endless typing and task-juggling? TextSpeedy is your productivity power
 TextSpeedy puts you in control. It’s completely free to download, and you have unlimited flexibility in how you use it.
 
 Author: Ho Dang 
+
 Linkedin: https://www.linkedin.com/in/dangngocho/
+
 Email: textspeedy@gmail.com
+
 Website: https://textspeedy.com
