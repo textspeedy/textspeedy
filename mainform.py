@@ -58,9 +58,14 @@ def load_nodes(treeview):
         treeview.insert("", "end", values=(
             item[0], item[1], item[2]))  # id, title, shortcut
 
+def treeview_has_items(treeview):
+    for item in treeview.get_children():
+        return True
+    return False
 
 def select_first_item(treeview):
     # Assuming 'tree' is your Treeview widget
+    if treeview_has_items(treeview) == False: return
     # Get the ID of the first item
     first_item = treeview.get_children()[0]
     # Set the focus to the first item
