@@ -2,6 +2,8 @@ Tired of endless typing and task-juggling? TextSpeedy is your productivity power
 
 TextSpeedy puts you in control. It’s completely free to download, and you have unlimited flexibility in how you use it.
 
+TextSpeedy is open source software written in Python.
+
 Author: Ho Dang
 
 Linkedin: https://www.linkedin.com/in/dangngocho/
