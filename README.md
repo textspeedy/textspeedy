@@ -11,3 +11,6 @@ Linkedin: https://www.linkedin.com/in/dangngocho/
 Email: textspeedy@gmail.com
 
 Website: https://textspeedy.com
+
+![TextSpeedy](https://textspeedy.com/wp-content/uploads/2024/06/TextSpeedy.png)
+
