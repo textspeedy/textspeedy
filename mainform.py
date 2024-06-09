@@ -522,7 +522,7 @@ def create_app():
 
     plugin_menu = Menu(menubar, tearoff=0)
     plugin_menu.add_command(
-        label="RSS Reader", command=lambda event=None: display_rss_reader(event), accelerator="F10")
+        label="RSS Reader", command=lambda event=None: display_rss_reader(event), accelerator="F6")
     plugin_menu.add_command(
         label="Text Utility", command=lambda event=None: display_text_utility(event), accelerator="F7")
     plugin_menu.add_command(
@@ -666,7 +666,7 @@ def create_app():
     popup_menu_text.add_command(
         label="Run Code With Live Output", command=lambda event=None: run_code_live_output(event), accelerator="F9")
     popup_menu_text.add_command(
-        label="Publish Wordpress", command=lambda event=None: publish_WP(event), accelerator="F6")
+        label="Publish Wordpress", command=lambda event=None: publish_WP(event), accelerator="F10")
 
     # Bind the click event to the Text widget
     editor.bind('<Button-1>', on_left_click_editor)
