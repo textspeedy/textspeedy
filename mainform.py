@@ -624,9 +624,12 @@ def create_app():
     root.bind('<Control-e>', send_emai)
     root.bind('<F4>', display_settings_dialog)
     root.bind('<F5>', run_code)
-    root.bind('<F6>', publish_WP)
+    root.bind('<F6>', display_rss_reader)
     root.bind('<F7>', display_text_utility)
     root.bind('<F8>', display_url_extractor)
+    root.bind('<F9>', run_code_live_output)
+    root.bind('<F10>', publish_WP)
+
 
     # Bind the event handler to the selection event
     combobox.bind('<<ComboboxSelected>>', combobox_selected_value)
