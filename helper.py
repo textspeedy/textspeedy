@@ -336,3 +336,13 @@ def plaintext_to_html(text):
   #html_text = html_text.replace(">", "&gt;")
   html_text = html_text.replace("\n", "<br>\n")
   return f"<p>{html_text}</p>"
+
+def clear_treeview(treeview):
+    for item in treeview.get_children():
+        treeview.delete(item)
+
+def expand_tree(tree, item):
+    """Recursively expands a tree node and its children."""
+    tree.item(item, open=True)  # Open the current item (node)
+    for child in tree.get_children(item):
+        expand_tree(tree, child)  # Recursively expand child nodes

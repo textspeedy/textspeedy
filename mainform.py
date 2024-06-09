@@ -17,8 +17,6 @@ import helper
 import webview
 import markdown
 
-import sv_ttk
-import text_utility
 
 selected_node_id = ''
 selected_node_category = 'All Categories'  # default
@@ -478,8 +476,12 @@ def publish_WP(event):
     messagebox.showinfo('Publish Wordpress',
                         'This note is published successfully')
 
+def display_rss_reader(event):
+    import rss_reader
+    rss_reader.display()
 
 def display_text_utility(event):
+    import text_utility
     text_utility.display()
 
 
@@ -519,6 +521,8 @@ def create_app():
     file_menu.add_command(label="Exit", command=sys.exit)
 
     plugin_menu = Menu(menubar, tearoff=0)
+    plugin_menu.add_command(
+        label="RSS Reader", command=lambda event=None: display_rss_reader(event), accelerator="F10")
     plugin_menu.add_command(
         label="Text Utility", command=lambda event=None: display_text_utility(event), accelerator="F7")
     plugin_menu.add_command(
