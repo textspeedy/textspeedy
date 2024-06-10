@@ -12,6 +12,7 @@ import helper
 category = ""
 feed_name = ""
 feed_link = ""
+progress_var = 0
 
 
 def create_toolbar(master):
@@ -51,7 +52,8 @@ def load_item_for_feeds(category, tree, feed_link):
     data = helper.db.get_all_feed_item(category, feed_link)
     for item in data:
         tree_feed_item.insert("", "end", values=(
-            item[4], item[5], helper.format_date(item[7])))  # title, url, published date
+            # title, url, published date
+            item[4], item[5], helper.format_date(item[7])))
 
 
 def on_feed_select(event):
@@ -86,23 +88,26 @@ def on_feed_item_select(event):
 
 def rss_all_feed_items(event):
 
-    global category, feed_name, feed_link
+    global category, feed_name, feed_link, progress_var
 
     data = helper.db.get_all_feed_category()
 
+    index = 0
     for item in data:
+        index += 1
         category1 = item[1]
         feed_name1 = item[2]
         feed_link1 = item[3]
         helper.rss_feed_items(category1, feed_name1, feed_link1)
         print(feed_name1)
+        progress_var.set(index / len(data) * 100)
+        root.update()  # Update the GUI to show progress
 
     load_item_for_feeds(category, tree_feed_item, feed_link)
 
-
 def display():
 
-    global root, tree_feed, tree_feed_item, webview_frame, webview_window
+    global root, tree_feed, tree_feed_item, webview_window, progress_var
     # Create the main window
 
     root = ttk.Window(themename=helper.get_theme())
@@ -157,6 +162,13 @@ def display():
     # Configure row weights to allow vertical expansion
     # Allow the row to expand vertically
     main_frame.grid_rowconfigure(0, weight=1)
+
+    # Create a progress bar
+    progress_var = tk.DoubleVar(value=0)
+    progress = ttk.Progressbar(main_frame, orient="horizontal",
+                               length=200, mode="determinate", variable=progress_var)
+
+    progress.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
 
     helper.center_window(root, 1360, 768)
 
