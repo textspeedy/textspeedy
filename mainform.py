@@ -709,7 +709,7 @@ def create_app():
 
     helper.center_window(root, 1360, 768)
 
-    #hide_window()
+    hide_window()
 
     root.mainloop()
 

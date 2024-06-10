@@ -1,12 +1,7 @@
 import tempfile
 import subprocess
-import sys
-import io
 import re
 from collections import OrderedDict
-
-import requests
-from bs4 import BeautifulSoup
 
 import base64
 import xml.etree.ElementTree as ET
@@ -22,6 +17,12 @@ from html.parser import HTMLParser
 
 from datetime import datetime
 from tkinter.font import Font
+
+import requests
+from bs4 import BeautifulSoup
+import feedparser
+from urllib.parse import urlparse
+from datetime import datetime
 
 from database import Database
 
@@ -205,8 +206,6 @@ def publish_WP(url,username, password,title, status, category, content):
 
     response = requests.post(url, headers=header, json=post)
 
-    print(response)
-
 def capitalize_each_word(text):
     return '\n'.join(' '.join(word.capitalize() for word in line.split()) for line in text.splitlines())
 
@@ -346,3 +345,55 @@ def expand_tree(tree, item):
     tree.item(item, open=True)  # Open the current item (node)
     for child in tree.get_children(item):
         expand_tree(tree, child)  # Recursively expand child nodes
+
+def rss_feed_items(category, source_name, source_link):
+    result = None
+
+    try:
+        response = requests.get(source_link)
+        response.raise_for_status()  # Raise an exception for bad responses
+
+        # Parse RSS feed using feedparser
+        feed = feedparser.parse(response.content)
+
+        result = feed
+
+        # Extract and store feed items
+        for entry in feed.entries:
+            published_date = get_published_date(entry)  # Assuming a helper function
+            updated_date = entry.get("updated", "")  # Handle missing 'updated'
+
+            # Store data (assuming you have a database helper)
+            db.insert_feed_item(
+                category, source_name, source_link,
+                entry.title, entry.link, entry.get("description", ""),
+                published_date, updated_date, 1
+            )
+
+    except Exception as e:
+        # Handle exceptions appropriately (logging, error handling, etc.)
+        pass
+
+    return result
+
+
+# Helper function to extract published date (example implementation)
+def get_published_date(entry):
+    published_parsed = entry.get("published_parsed")
+    if published_parsed:
+        return datetime(*published_parsed[:6]).isoformat()
+    else:
+        return ""  
+
+def format_date(timestamp_str):
+    try:
+        # Parse the timestamp string using the correct format
+        datetime_obj = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
+
+        # Reformat the datetime object to the desired format
+        new_timestamp_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+
+        return new_timestamp_str
+    except ValueError:
+        # Handle the case where the input is not a valid timestamp
+        return None

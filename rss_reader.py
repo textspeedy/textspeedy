@@ -9,16 +9,21 @@ import helper
 
 # Function to open a file
 
-
-def open_file():
-    pass
+category = ""
+feed_name = ""
+feed_link = ""
 
 
 def create_toolbar(master):
     toolbar = tk.Frame(master, bd=1, relief=tk.RAISED)
-    open_button = tk.Button(toolbar, text="Open Link", command=open_file)
+    open_button = tk.Button(toolbar, text="Open Link")
     open_button.pack(side=tk.LEFT, padx=2, pady=2)
     open_button.bind('<ButtonRelease-1>', on_feed_item_select)
+
+    getAllFeeds_button = tk.Button(toolbar, text="Get All")
+    getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
+    getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
+
     toolbar.pack(side=tk.TOP, fill=tk.X)
 
 
@@ -39,28 +44,30 @@ def load_feeds_for_category(category, tree, parent_node=""):
 # Modified load_feeds_for_category function
 
 
-def load_item_for_feeds(category, tree, feed_source):
+def load_item_for_feeds(category, tree, feed_link):
     selected_item = tree_feed.focus()
     category = tree_feed.item(selected_item, "text")
-    print(category)
 
-    data = helper.db.get_all_feed_item(category, feed_source)
+    data = helper.db.get_all_feed_item(category, feed_link)
     for item in data:
         tree_feed_item.insert("", "end", values=(
-            item[4], item[5], item[7]))  # title, url, published date
+            item[4], item[5], helper.format_date(item[7])))  # title, url, published date
 
 
 def on_feed_select(event):
+    global category, feed_name, feed_link
     helper.clear_treeview(tree_feed_item)
     selected_item = tree_feed.focus()
-    category = tree_feed.item(selected_item, "text")
     item_values = tree_feed.item(selected_item, "values")
 
     if item_values:
-        feed_source = item_values[0]  # Get the first value from the tuple
+        parent_id = tree_feed.parent(selected_item)
+        category = tree_feed.item(parent_id, "text")
+        feed_name = tree_feed.item(selected_item, "text")
+        feed_link = item_values[0]  # Get the first value from the tuple
 
-    if feed_source != None:
-        load_item_for_feeds(category, tree_feed_item, feed_source)
+    if feed_link != None:
+        load_item_for_feeds(category, tree_feed_item, feed_link)
 
 
 def on_feed_item_select(event):
@@ -76,17 +83,33 @@ def on_feed_item_select(event):
     )
     webview.start()  # Start the webview background thread
 
+
+def rss_all_feed_items(event):
+
+    global category, feed_name, feed_link
+
+    data = helper.db.get_all_feed_category()
+
+    for item in data:
+        category1 = item[1]
+        feed_name1 = item[2]
+        feed_link1 = item[3]
+        helper.rss_feed_items(category1, feed_name1, feed_link1)
+        print(feed_name1)
+
+    load_item_for_feeds(category, tree_feed_item, feed_link)
+
+
 def display():
 
     global root, tree_feed, tree_feed_item, webview_frame, webview_window
     # Create the main window
 
-
     root = ttk.Window(themename=helper.get_theme())
 
     root.title("RSS Reader")
     root.geometry('1360x768')
-    #root.state('zoomed')  # Set the window to fullscreen
+    # root.state('zoomed')  # Set the window to fullscreen
 
     create_toolbar(root)
 
@@ -125,11 +148,11 @@ def display():
     # Place widgets in the main frame using grid layout manager
     tree_feed.grid(row=0, column=0, sticky="nsew")
     tree_feed_item.grid(row=0, column=1, sticky="nsew")
-   
+
     # Configure column weights to control relative widths
     main_frame.grid_columnconfigure(0, weight=1)  # 10%
     main_frame.grid_columnconfigure(1, weight=9)  # 80%
-    #main_frame.grid_columnconfigure(2, weight=5)  # 50%
+    # main_frame.grid_columnconfigure(2, weight=5)  # 50%
 
     # Configure row weights to allow vertical expansion
     # Allow the row to expand vertically
@@ -141,6 +164,7 @@ def display():
     tree_feed_item.bind("<Return>", on_feed_item_select)
 
     root.mainloop()
+
 
 if __name__ == '__main__':
     # Call the function to create the window
