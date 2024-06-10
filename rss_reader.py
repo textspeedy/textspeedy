@@ -21,7 +21,7 @@ def create_toolbar(master):
     open_button.pack(side=tk.LEFT, padx=2, pady=2)
     open_button.bind('<ButtonRelease-1>', on_feed_item_select)
 
-    getAllFeeds_button = tk.Button(toolbar, text="Get All")
+    getAllFeeds_button = tk.Button(toolbar, text="Fetch All")
     getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
     getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
 
