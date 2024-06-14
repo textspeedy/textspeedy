@@ -25,7 +25,22 @@ def create_toolbar(master):
     getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
     getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
 
+    # Combobox options
+    options = ["Show All", "Show Unread"]
+
+    # Create the combobox
+    global state_combobox
+    state_combobox = ttk.Combobox(toolbar, values=options)
+    state_combobox.state(["readonly"])
+    state_combobox.set("Show Unread")  # Set the default value to "Read"
+    state_combobox.pack(side=tk.LEFT, padx=2, pady=2)
+    state_combobox.bind("<<ComboboxSelected>>", combobox_changed)
+
     toolbar.pack(side=tk.TOP, fill=tk.X)
+
+
+def combobox_changed(event):
+    load_item_for_feeds(category, tree_feed_item, feed_link)
 
 
 def load_categories(tree):
@@ -46,10 +61,18 @@ def load_feeds_for_category(category, tree, parent_node=""):
 
 
 def load_item_for_feeds(category, tree, feed_link):
+    global state_combobox
+    helper.clear_treeview(tree_feed_item)
+
     selected_item = tree_feed.focus()
     category = tree_feed.item(selected_item, "text")
+    selected_value = state_combobox.get()
 
-    data = helper.db.get_all_feed_item(category, feed_link)
+    if selected_value == "Show All":
+        data = helper.db.get_all_feed_item(category, feed_link)
+    else:  # unread
+        data = helper.db.get_unread_feed_item(category, feed_link)
+
     for item in data:
         tree_feed_item.insert("", "end", values=(
             # title, url, published date
@@ -74,8 +97,15 @@ def on_feed_select(event):
 
 def on_feed_item_select(event):
     global url, webview_window  # Make the webview globally accessible
+    # Safety Check: Ensure an item is selected
+    if not tree_feed_item.selection():
+        print("Warning: No feed item selected.")  # Log for debugging
+        return  # Exit the function gracefully
+    
     selected_item = tree_feed_item.selection()[0]
     url = tree_feed_item.item(selected_item, "values")[1]  # Get the URL
+    helper.db.mark_read_feed_item(url,0)
+
     webview_window = webview.create_window(
         "Web Browser",
         url=url,  # Directly load the URL here
@@ -85,6 +115,17 @@ def on_feed_item_select(event):
     )
     webview.start()  # Start the webview background thread
 
+def on_select_treefeed(event):
+    global url, webview_window  # Make the webview globally accessible
+
+    # Safety Check: Ensure an item is selected
+    if not tree_feed_item.selection():
+        print("Warning: No feed item selected.")  # Log for debugging
+        return  # Exit the function gracefully
+
+    selected_item = tree_feed_item.selection()[0]
+    url = tree_feed_item.item(selected_item, "values")[1]  # Get the URL
+    helper.db.mark_read_feed_item(url,0)
 
 def rss_all_feed_items(event):
 
@@ -99,11 +140,11 @@ def rss_all_feed_items(event):
         feed_name1 = item[2]
         feed_link1 = item[3]
         helper.rss_feed_items(category1, feed_name1, feed_link1)
-        print(feed_name1)
         progress_var.set(index / len(data) * 100)
         root.update()  # Update the GUI to show progress
 
     load_item_for_feeds(category, tree_feed_item, feed_link)
+
 
 def display():
 
@@ -174,6 +215,7 @@ def display():
 
     tree_feed_item.bind("<Double-1>", on_feed_item_select)
     tree_feed_item.bind("<Return>", on_feed_item_select)
+    tree_feed_item.bind('<<TreeviewSelect>>', on_select_treefeed)
 
     root.mainloop()
 
