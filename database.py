@@ -362,10 +362,10 @@ class Database:
         cursor.execute(query, (category, sourceName, sourceLink))
         self.connection.commit()
 
-    def update_feed_category_by_source_link(self, category, sourceName, sourceLink):
-        query = "UPDATE feed_category SET category = ?, sourceName = ?, sourceLink = ? WHERE sourceLink = ?"
+    def update_feed_name(self, sourceName, sourceLink):
+        query = "UPDATE feed_category SET sourceName = ? WHERE sourceLink = ?"
         cursor = self.connection.cursor()
-        cursor.execute(query, (category, sourceName, sourceLink, sourceLink))
+        cursor.execute(query, (sourceName, sourceLink,))
         self.connection.commit()
 
     def update_feed_category(self, old_category, new_category):

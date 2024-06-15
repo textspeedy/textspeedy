@@ -201,8 +201,32 @@ def ađd_feed(event):
 
         load_item_for_feeds(category,feed_name,feed_url)
 
+def delete_feed(event):
+    global category, feed_name, feed_link
+
+    answer = messagebox.askyesno(title='Confirmation',
+                                 message='Are you sure that you want to delete this feed?')
+
+    if answer:
+        helper.db.delete_feed_category(category, feed_link)
+
+        load_categories(tree_feed)
+
+def rename_feed(event):
+    global feed_name, feed_link
+
+    new_feed_name = simpledialog.askstring(
+        title="Rename Feed", prompt="Enter new feed name:\t\t\t\t\t", initialvalue=feed_name
+    )
+
+    if new_feed_name != None and new_feed_name != "":
+
+        helper.db.update_feed_name(new_feed_name,feed_link)
+
+        load_categories(tree_feed)
+
 def ađd_category(event):
-    global category, feed_name, tree_feed
+    global category, feed_name
 
     new_category = simpledialog.askstring(
         title="Add Category", prompt="Enter Category:\t\t\t\t\t"
@@ -215,19 +239,18 @@ def ađd_category(event):
         load_categories(tree_feed)
 
 def delete_category(event):
-    global category, feed_name, feed_link
+    global category
 
     answer = messagebox.askyesno(title='Confirmation',
                                  message='Are you sure that you want to delete this category?')
 
     if answer:
-        print(category)
         helper.db.delete_feed_category(category, "")
 
         load_categories(tree_feed)
 
 def rename_category(event):
-    global category, feed_name, tree_feed
+    global category
 
     new_category = simpledialog.askstring(
         title="Rename Category", prompt="Enter new category name:\t\t\t\t\t", initialvalue=category
@@ -249,6 +272,12 @@ def create_popup_menu():
         label="Rename Category", command=lambda event=None: rename_category(event))
     popup_menu_treeview.add_command(
         label="Delete Category", command=lambda event=None: delete_category(event))
+    popup_menu_treeview.add_command(
+        label="New Feed", command=lambda event=None: ađd_feed(event))
+    popup_menu_treeview.add_command(
+        label="Rename Feed", command=lambda event=None: rename_feed(event))
+    popup_menu_treeview.add_command(
+        label="Delete Feed", command=lambda event=None: delete_feed(event))
     
 def on_right_click_treeview(event):
     # Identify the row clicked
