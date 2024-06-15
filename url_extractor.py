@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 
 import helper
 import pandas as pd
-import csv
+from datetime import datetime
+
 
 urls =""
 
@@ -69,17 +70,15 @@ def execute(event):
     create_custom_dialog()
 
 def export(event):
-
     # Create a DataFrame from Treeview data
     columns = ["Title", "Description", "Keywords", "Response Code", "URL", "Title Length"]
     data = [tree.item(item)["values"] for item in tree.get_children()]
     df = pd.DataFrame(data, columns=columns)
 
-    data = [tree.item(item)["values"] for item in tree.get_children()]
-    df = pd.DataFrame(data, columns=columns)
+    # Get current local date and time
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Save DataFrame to an Excel file
-    excel_file = "treeview_data.xlsx"
+    excel_file = f"url_data_{current_time}.xlsx"
     df.to_excel(excel_file, index=False)
     print(f"Data exported to {excel_file}")
 
@@ -95,7 +94,7 @@ btnExecute = tk.Button(toolbar, text="Import")
 btnExecute.pack(side="left", padx=(5, 5))
 btnExecute.bind('<ButtonRelease-1>', execute)
 
-# Add buttons to the toolbar
+# Add Export button to the toolbar
 btnExport = tk.Button(toolbar, text="Export")
 btnExport.pack(side="left", padx=(5, 5))
 btnExport.bind('<ButtonRelease-1>', export)

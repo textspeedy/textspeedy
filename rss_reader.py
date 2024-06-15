@@ -4,6 +4,8 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 import webview
+import pandas as pd
+from datetime import datetime
 
 import helper
 
@@ -17,13 +19,6 @@ progress_var = 0
 
 def create_toolbar(master):
     toolbar = tk.Frame(master, bd=1, relief=tk.RAISED)
-    open_button = tk.Button(toolbar, text="Open Link")
-    open_button.pack(side=tk.LEFT, padx=2, pady=2)
-    open_button.bind('<ButtonRelease-1>', on_feed_item_select)
-
-    getAllFeeds_button = tk.Button(toolbar, text="Fetch All")
-    getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
-    getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
 
     # Combobox options
     options = ["Show All", "Show Unread"]
@@ -36,12 +31,39 @@ def create_toolbar(master):
     state_combobox.pack(side=tk.LEFT, padx=2, pady=2)
     state_combobox.bind("<<ComboboxSelected>>", combobox_changed)
 
+    open_button = tk.Button(toolbar, text="Open Link")
+    open_button.pack(side=tk.LEFT, padx=2, pady=2)
+    open_button.bind('<ButtonRelease-1>', on_feed_item_select)
+
+    getAllFeeds_button = tk.Button(toolbar, text="Fetch All")
+    getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
+    getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
+
+    # Add Export button to the toolbar
+    btnExport = tk.Button(toolbar, text="Export")
+    btnExport.pack(side="left", padx=(2, 2))
+    btnExport.bind('<ButtonRelease-1>', export)
+
     toolbar.pack(side=tk.TOP, fill=tk.X)
 
 
 def combobox_changed(event):
     load_item_for_feeds(category, tree_feed_item, feed_link)
 
+
+def export(event):
+    global category, feed_name, feed_link
+
+    columns = ["Title", "URL", "Published", "Category", "Feed Name"]
+    data = [tree_feed_item.item(item)["values"] + [category, feed_name] for item in tree_feed_item.get_children()]
+    df = pd.DataFrame(data, columns=columns)
+
+    # Get current local date and time
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    excel_file = f"feed_data_{current_time}.xlsx"
+    df.to_excel(excel_file, index=False)
+    print(f"Data exported to {excel_file}")
 
 def load_categories(tree):
     for category in helper.db.get_all_category():
