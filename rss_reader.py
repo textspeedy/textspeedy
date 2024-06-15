@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog, simpledialog
+from tkinter import ttk, filedialog, simpledialog, messagebox
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
@@ -36,9 +36,13 @@ def create_toolbar(master):
     getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
     getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
 
-    addFeeds_button = tk.Button(toolbar, text="Add Feed")
-    addFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
-    addFeeds_button.bind('<ButtonRelease-1>', ađd_feed)
+    addFeed_button = tk.Button(toolbar, text="Add Feed")
+    addFeed_button.pack(side=tk.LEFT, padx=2, pady=2)
+    addFeed_button.bind('<ButtonRelease-1>', ađd_feed)
+
+    addCategory_button = tk.Button(toolbar, text="Add Category")
+    addCategory_button.pack(side=tk.LEFT, padx=2, pady=2)
+    addCategory_button.bind('<ButtonRelease-1>', ađd_category)
 
     open_button = tk.Button(toolbar, text="Open Link")
     open_button.pack(side=tk.LEFT, padx=2, pady=2)
@@ -93,6 +97,9 @@ def load_categories(tree):
         category_node = tree.insert("", tk.END, text=category[0])
         # Load feeds under the category node
         load_feeds_for_category(category[0], tree, category_node)
+    
+    for category_node in tree_feed.get_children():
+        helper.expand_tree(tree_feed, category_node)
 
 # Modified load_feeds_for_category function
 
@@ -128,6 +135,8 @@ def on_feed_select(event):
     global category, feed_name, feed_link
     helper.clear_treeview(tree_feed_item)
     selected_item = tree_feed.focus()
+    category = tree_feed.item(selected_item, "text")
+
     item_values = tree_feed.item(selected_item, "values")
 
     if item_values:
@@ -192,6 +201,67 @@ def ađd_feed(event):
 
         load_item_for_feeds(category,feed_name,feed_url)
 
+def ađd_category(event):
+    global category, feed_name, tree_feed
+
+    new_category = simpledialog.askstring(
+        title="Add Category", prompt="Enter Category:\t\t\t\t\t"
+    )
+
+    if new_category != None and new_category != "":
+
+        helper.db.insert_feed_category(new_category, "", "")
+
+        load_categories(tree_feed)
+
+def delete_category(event):
+    global category, feed_name, feed_link
+
+    answer = messagebox.askyesno(title='Confirmation',
+                                 message='Are you sure that you want to delete this category?')
+
+    if answer:
+        print(category)
+        helper.db.delete_feed_category(category, "")
+
+        load_categories(tree_feed)
+
+def rename_category(event):
+    global category, feed_name, tree_feed
+
+    new_category = simpledialog.askstring(
+        title="Rename Category", prompt="Enter new category name:\t\t\t\t\t", initialvalue=category
+    )
+
+    if new_category != None and new_category != "":
+
+        helper.db.update_feed_category(category,new_category)
+
+        load_categories(tree_feed)
+
+def create_popup_menu():
+        # Create the popup menu
+    global popup_menu_treeview
+    popup_menu_treeview = tk.Menu(root, tearoff=0)
+    popup_menu_treeview.add_command(
+        label="New Category", command=lambda event=None: ađd_category(event))
+    popup_menu_treeview.add_command(
+        label="Rename Category", command=lambda event=None: rename_category(event))
+    popup_menu_treeview.add_command(
+        label="Delete Category", command=lambda event=None: delete_category(event))
+    
+def on_right_click_treeview(event):
+    # Identify the row clicked
+    row_id = tree_feed.identify_row(event.y)
+    if row_id:
+        # Set the selection to the row where the right click occurred
+        tree_feed.selection_set(row_id)
+    # Display the popup menu
+    try:
+        popup_menu_treeview.tk_popup(event.x_root, event.y_root, 0)
+    finally:
+        # Release the grab (for Tk 8.0a1 only)
+        popup_menu_treeview.grab_release()
 
 def rss_all_feed_items(event):
 
@@ -225,14 +295,17 @@ def display():
 
     create_toolbar(root)
 
+    create_popup_menu()
+
     # Main Content Frame (Use grid layout manager here)
     main_frame = ttk.Frame(root)
     main_frame.pack(fill=tk.BOTH, expand=True)
 
     # Treeview 1 (Categories)
     tree_feed = ttk.Treeview(main_frame)
-    tree_feed.heading("#0", text="Categories", anchor="w")
+    tree_feed.heading("#0", text="All Categories", anchor="w")
     tree_feed.bind("<<TreeviewSelect>>", on_feed_select)
+    tree_feed.bind('<Button-3>', on_right_click_treeview)
 
     load_categories(tree_feed)  # Load categories initially
 

@@ -262,7 +262,7 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 category TEXT,
                 sourceName TEXT,
-                sourceLink TEXT UNIQUE
+                sourceLink TEXT
             )
         """)
         self.connection.commit()
@@ -362,16 +362,22 @@ class Database:
         cursor.execute(query, (category, sourceName, sourceLink))
         self.connection.commit()
 
-    def update_feed_category(self, category, sourceName, sourceLink):
+    def update_feed_category_by_source_link(self, category, sourceName, sourceLink):
         query = "UPDATE feed_category SET category = ?, sourceName = ?, sourceLink = ? WHERE sourceLink = ?"
         cursor = self.connection.cursor()
         cursor.execute(query, (category, sourceName, sourceLink, sourceLink))
         self.connection.commit()
 
-    def delete_feed_category(self, sourceLink):
-        query = "DELETE FROM feed_category WHERE sourceLink = ?"
+    def update_feed_category(self, old_category, new_category):
+        query = "UPDATE feed_category SET category = ? WHERE category = ?"
         cursor = self.connection.cursor()
-        cursor.execute(query, (sourceLink,))
+        cursor.execute(query, (new_category, old_category,))
+        self.connection.commit()
+
+    def delete_feed_category(self, category, sourceLink):
+        query = "DELETE FROM feed_category WHERE category = ? AND sourceLink = ?"
+        cursor = self.connection.cursor()
+        cursor.execute(query, (category, sourceLink,))
         self.connection.commit()
 
     def get_all_feed_category(self):

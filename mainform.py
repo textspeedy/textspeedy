@@ -5,7 +5,7 @@ from pystray import MenuItem as item
 import pystray
 from PIL import Image, ImageTk
 
-from tkinter import Menu, messagebox, Scrollbar, Text, simpledialog, END, VERTICAL
+from tkinter import Menu, messagebox, simpledialog, END, VERTICAL
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
