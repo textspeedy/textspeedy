@@ -346,6 +346,24 @@ def expand_tree(tree, item):
     for child in tree.get_children(item):
         expand_tree(tree, child)  # Recursively expand child nodes
 
+def rss_get_feed_name(source_link):
+    result = None
+
+    try:
+        response = requests.get(source_link)
+        response.raise_for_status()  # Raise an exception for bad responses
+
+        # Parse RSS feed using feedparser
+        feed = feedparser.parse(response.content)
+
+        result = feed.feed.title
+
+    except Exception as e:
+        # Handle exceptions appropriately (logging, error handling, etc.)
+        pass
+
+    return result
+
 def rss_feed_items(category, source_name, source_link):
     result = None
 

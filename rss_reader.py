@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, simpledialog
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
@@ -31,13 +32,17 @@ def create_toolbar(master):
     state_combobox.pack(side=tk.LEFT, padx=2, pady=2)
     state_combobox.bind("<<ComboboxSelected>>", combobox_changed)
 
-    open_button = tk.Button(toolbar, text="Open Link")
-    open_button.pack(side=tk.LEFT, padx=2, pady=2)
-    open_button.bind('<ButtonRelease-1>', on_feed_item_select)
-
     getAllFeeds_button = tk.Button(toolbar, text="Fetch All")
     getAllFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
     getAllFeeds_button.bind('<ButtonRelease-1>', rss_all_feed_items)
+
+    addFeeds_button = tk.Button(toolbar, text="Add Feed")
+    addFeeds_button.pack(side=tk.LEFT, padx=2, pady=2)
+    addFeeds_button.bind('<ButtonRelease-1>', ađd_feed)
+
+    open_button = tk.Button(toolbar, text="Open Link")
+    open_button.pack(side=tk.LEFT, padx=2, pady=2)
+    open_button.bind('<ButtonRelease-1>', on_feed_item_select)
 
     # Add Export button to the toolbar
     btnExport = tk.Button(toolbar, text="Export")
@@ -55,13 +60,14 @@ def export(event):
     global category, feed_name, feed_link
 
     columns = ["Title", "URL", "Published", "Category", "Feed Name"]
-    data = [tree_feed_item.item(item)["values"] + [category, feed_name] for item in tree_feed_item.get_children()]
+    data = [tree_feed_item.item(item)["values"] + [category, feed_name]
+            for item in tree_feed_item.get_children()]
     df = pd.DataFrame(data, columns=columns)
 
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     initial_filename = f"feed_data_{current_time}.xlsx"
     filepath = filedialog.asksaveasfilename(
-        initialdir="/",  
+        initialdir="/",
         title="Save Feed Data",
         initialfile=initial_filename,
         defaultextension=".xlsx",  # Default to Excel file format
@@ -79,7 +85,10 @@ def export(event):
     except Exception as e:
         print(f"Error exporting data: {e}")
 
+
 def load_categories(tree):
+    helper.clear_treeview(tree)
+
     for category in helper.db.get_all_category():
         category_node = tree.insert("", tk.END, text=category[0])
         # Load feeds under the category node
@@ -137,10 +146,10 @@ def on_feed_item_select(event):
     if not tree_feed_item.selection():
         print("Warning: No feed item selected.")  # Log for debugging
         return  # Exit the function gracefully
-    
+
     selected_item = tree_feed_item.selection()[0]
     url = tree_feed_item.item(selected_item, "values")[1]  # Get the URL
-    helper.db.mark_read_feed_item(url,0)
+    helper.db.mark_read_feed_item(url, 0)
 
     webview_window = webview.create_window(
         "Web Browser",
@@ -150,6 +159,7 @@ def on_feed_item_select(event):
         height=768
     )
     webview.start()  # Start the webview background thread
+
 
 def on_select_treefeed(event):
     global url, webview_window  # Make the webview globally accessible
@@ -161,7 +171,27 @@ def on_select_treefeed(event):
 
     selected_item = tree_feed_item.selection()[0]
     url = tree_feed_item.item(selected_item, "values")[1]  # Get the URL
-    helper.db.mark_read_feed_item(url,0)
+    helper.db.mark_read_feed_item(url, 0)
+
+
+def ađd_feed(event):
+    global category, feed_name, tree_feed
+
+    feed_url = simpledialog.askstring(
+        title="Add Feed", prompt="Enter Feed Url:\t\t\t\t\t"
+    )
+
+    if feed_url != None and feed_url != "":
+        feed_name =  helper.rss_get_feed_name(feed_url)
+
+        helper.db.insert_feed_category(category, feed_name, feed_url)
+
+        helper.rss_feed_items(category, feed_name, feed_url)
+
+        load_categories(tree_feed)
+
+        load_item_for_feeds(category,feed_name,feed_url)
+
 
 def rss_all_feed_items(event):
 
