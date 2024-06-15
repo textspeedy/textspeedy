@@ -58,12 +58,26 @@ def export(event):
     data = [tree_feed_item.item(item)["values"] + [category, feed_name] for item in tree_feed_item.get_children()]
     df = pd.DataFrame(data, columns=columns)
 
-    # Get current local date and time
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    initial_filename = f"feed_data_{current_time}.xlsx"
+    filepath = filedialog.asksaveasfilename(
+        initialdir="/",  
+        title="Save Feed Data",
+        initialfile=initial_filename,
+        defaultextension=".xlsx",  # Default to Excel file format
+        filetypes=(("Excel files", "*.xlsx"), ("All files", "*.*"))
+    )
 
-    excel_file = f"feed_data_{current_time}.xlsx"
-    df.to_excel(excel_file, index=False)
-    print(f"Data exported to {excel_file}")
+    # Error Handling
+    if not filepath:
+        print("Export canceled.")
+        return  # User canceled the dialog
+
+    try:
+        df.to_excel(filepath, index=False)
+        print(f"Data exported successfully to {filepath}")
+    except Exception as e:
+        print(f"Error exporting data: {e}")
 
 def load_categories(tree):
     for category in helper.db.get_all_category():
