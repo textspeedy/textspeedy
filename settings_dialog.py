@@ -18,7 +18,7 @@ def save_credentials():
     helper.db.update_settings_by_key('WP_Username',wp_username)
     helper.db.update_settings_by_key('WP_Password',wp_password)
 
-    messagebox.showinfo("Saved", "Credentials saved successfully!")
+    messagebox.showinfo("Saved", "Settings saved successfully!")
 
     root.destroy();
 

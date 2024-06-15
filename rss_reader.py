@@ -15,7 +15,7 @@ import helper
 category = ""
 feed_name = ""
 feed_link = ""
-progress_var = 0
+#progress_var = 0
 
 
 def create_toolbar(master):
@@ -305,7 +305,8 @@ def rss_all_feed_items(event):
         feed_name1 = item[2]
         feed_link1 = item[3]
         helper.rss_feed_items(category1, feed_name1, feed_link1)
-        progress_var.set(index / len(data) * 100)
+        pg = index / len(data) * 100
+        progress_var.set(pg)
         root.update()  # Update the GUI to show progress
 
     load_item_for_feeds(category, tree_feed_item, feed_link)
@@ -373,6 +374,7 @@ def display():
     main_frame.grid_rowconfigure(0, weight=1)
 
     # Create a progress bar
+
     progress_var = tk.DoubleVar(value=0)
     progress = ttk.Progressbar(main_frame, orient="horizontal",
                                length=200, mode="determinate", variable=progress_var)
