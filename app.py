@@ -10,14 +10,23 @@ keys = []
 
 kb = Controller()
 
+
 def on_press(key):
 
     if hasattr(key, 'char'):
-        # Alphanumeric key
-        if key.char == '/':
-            keys.clear()
-        if key.char.isalnum() or key.char == '.':
-            keys.append(key.char)
+        try:
+            # Alphanumeric key (handling the case of '/' is inside the try-except block)
+            if key.char == '/':
+                keys.clear()
+            elif key.char.isalnum() or key.char == '.':
+                keys.append(key.char)
+
+        except AttributeError:
+            # Handle the case where `key` doesn't have a `char` attribute
+            print("Error: Key does not have a 'char' attribute.")
+
+        except Exception as e:  # Catch any other unexpected exceptions
+            print(f"An unexpected error occurred: {e}")
     else:
         # Special key
         if key == keyboard.Key.space:
@@ -82,9 +91,10 @@ def delText(s):
         kb.press(Key.backspace)
         kb.release(Key.backspace)
 
+
 def on_clicked(icon, item):
-  if str(item) == "Quit":
-    icon.stop()
+    if str(item) == "Quit":
+        icon.stop()
 
 
 def start_app():
@@ -94,6 +104,7 @@ def start_app():
 
 def setup(icon):
     icon.visible = True
+
 
 # Set up the listener in a non-blocking fashion
 listener = keyboard.Listener(on_press=on_press)

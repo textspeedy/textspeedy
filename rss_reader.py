@@ -4,6 +4,7 @@ from tkinter import ttk, filedialog, simpledialog, messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
+import webbrowser
 import webview
 import pandas as pd
 from datetime import datetime
@@ -44,9 +45,13 @@ def create_toolbar(master):
     addCategory_button.pack(side=tk.LEFT, padx=2, pady=2)
     addCategory_button.bind('<ButtonRelease-1>', ađd_category)
 
+    quick_view_button = tk.Button(toolbar, text="Quick View")
+    quick_view_button.pack(side=tk.LEFT, padx=2, pady=2)
+    quick_view_button.bind('<ButtonRelease-1>', on_feed_item_select)
+
     open_button = tk.Button(toolbar, text="Open Link")
     open_button.pack(side=tk.LEFT, padx=2, pady=2)
-    open_button.bind('<ButtonRelease-1>', on_feed_item_select)
+    open_button.bind('<ButtonRelease-1>', open_link)
 
     # Add Export button to the toolbar
     btnExport = tk.Button(toolbar, text="Export")
@@ -148,6 +153,11 @@ def on_feed_select(event):
     if feed_link != None:
         load_item_for_feeds(category, tree_feed_item, feed_link)
 
+
+def open_link(event):
+    selected_item = tree_feed_item.selection()[0]
+    url = tree_feed_item.item(selected_item, "values")[1]  # Get the URL
+    webbrowser.open(url)
 
 def on_feed_item_select(event):
     global url, webview_window  # Make the webview globally accessible
